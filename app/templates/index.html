@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LunchTab</title>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<main class="container">
+    <h1>LunchTab</h1>
+    <p>Shared office lunch-order tracker</p>
+
+    <section>
+        <h2>Dashboard</h2>
+        <div class="grid">
+            <div>
+                <strong>Total Owed:</strong> ${{ "%.2f"|format(total_owed) }}
+            </div>
+            <div>
+                <strong>Total Settled:</strong> ${{ "%.2f"|format(total_settled) }}
+            </div>
+            <div>
+                <strong>Overdue Debts:</strong> {{ overdue_count }}
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>New Order</h2>
+        <form method="post" action="/create">
+            <div class="grid">
+                <label>
+                    Person
+                    <input type="text" name="person" required placeholder="e.g., Alice">
+                </label>
+                <label>
+                    Item
+                    <input type="text" name="item" required placeholder="e.g., Salad">
+                </label>
+                <label>
+                    Amount ($)
+                    <input type="number" name="amount" step="0.01" min="0" required placeholder="e.g., 8.50">
+                </label>
+                <label>
+                    Date
+                    <input type="date" name="date" value="{{ today }}">
+                </label>
+                <div class="column">
+                    <button type="submit" class="contrast">Add Order</button>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <section>
+        <h2>Orders</h2>
+        {% if orders %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Person</th>
+                    <th>Item</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.person }}</td>
+                    <td>{{ order.item }}</td>
+                    <td>${{ "%.2f"|format(order.amount) }}</td>
+                    <td>{{ order.date }}</td>
+                    <td>
+                        {% if order.status == 'settled' %}
+                        <span>[settled]</span>
+                        {% else %}
+                        <span>[owing]</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if order.status == 'owing' %}
+                        <form method="post" action="/settle/{{ order.id }}" style="display: inline;">
+                            <button type="submit" class="secondary">Mark Settled</button>
+                        </form>
+                        {% else %}
+                        <span>-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No orders yet.</p>
+        {% endif %}
+    </section>
+</main>
+</body>
+</html>

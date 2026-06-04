@@ -1,0 +1,16 @@
+services:
+  lunchtab:
+    build: .
+    ports:
+      - "8723:8723"
+    volumes:
+      - lunchtab-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8723/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+volumes:
+  lunchtab-data:
