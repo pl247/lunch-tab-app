@@ -1,5 +1,6 @@
 services:
   lunchtab:
+    container_name: lunchtab
     build: .
     ports:
       - "8723:8723"
